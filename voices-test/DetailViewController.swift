@@ -7,34 +7,49 @@
 //
 
 import UIKit
+import AVFoundation
 
 class DetailViewController: UIViewController {
 
   @IBOutlet weak var detailDescriptionLabel: UILabel!
+  @IBOutlet weak var languageIdentifierLabel: UILabel!
+  @IBOutlet weak var languageCodeLabel: UILabel!
+  @IBOutlet weak var qualityControl: UISegmentedControl!
 
 
-  var detailItem: AnyObject? {
-    didSet {
-        // Update the view.
-        self.configureView()
-    }
-  }
+  var voice: AVSpeechSynthesisVoice!
+
+  var speakingText:String?
 
   func configureView() {
-    // Update the user interface for the detail item.
-    if let detail = self.detailItem {
-        if let label = self.detailDescriptionLabel {
-            label.text = detail.description
-        }
+    let locale = NSLocale(localeIdentifier: voice.language)
+    let code = voice.language
+    let text = locale.displayNameForKey(NSLocaleIdentifier, value: code)
+
+    title = voice.name
+    languageCodeLabel.text = code
+    languageIdentifierLabel.text = voice.identifier
+    detailDescriptionLabel.text = text
+    speakingText = text
+    qualityControl.selectedSegmentIndex = voice.quality.rawValue - AVSpeechSynthesisVoiceQuality.Default.rawValue
+  }
+
+
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+
+    if let text = speakingText {
+      let say = AVSpeechUtterance(string: text)
+      say.voice = voice
+      AVSpeechSynthesizer().speakUtterance(say)
     }
   }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
+  
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
     self.configureView()
   }
-
+  
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.

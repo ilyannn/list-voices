@@ -32,6 +32,7 @@ class MasterViewController: UITableViewController, UISearchResultsUpdating {
         tableView.tableHeaderView = searchController.searchBar
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
+        definesPresentationContext = true
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -48,10 +49,10 @@ class MasterViewController: UITableViewController, UISearchResultsUpdating {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
+            
             if let indexPath = self.tableView.indexPathForSelectedRow {
                 
                 let voice = objects[indexPath.row]
-                
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
                 
                 controller.voice = voice

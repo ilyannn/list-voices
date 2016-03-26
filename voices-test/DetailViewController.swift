@@ -12,8 +12,12 @@ import AVFoundation
 class DetailViewController: UIViewController {
 
   @IBOutlet weak var detailDescriptionLabel: UILabel!
-  @IBOutlet weak var languageIdentifierLabel: UILabel!
+  @IBOutlet weak var languageIdentifierLabel: UILabel?
+
+  @IBOutlet weak var languageNameLabel: UILabel!
+  @IBOutlet weak var countryNameLabel: UILabel!
   @IBOutlet weak var languageCodeLabel: UILabel!
+  
   @IBOutlet weak var qualityControl: UISegmentedControl!
 
 
@@ -22,16 +26,24 @@ class DetailViewController: UIViewController {
   var speakingText:String?
 
   func configureView() {
-    let locale = NSLocale(localeIdentifier: voice.language)
     let code = voice.language
-    let text = locale.displayNameForKey(NSLocaleIdentifier, value: code)
+
+    let target_locale = NSLocale(localeIdentifier: code)
+    let current_locale = NSLocale.currentLocale()
 
     title = voice.name
     languageCodeLabel.text = code
-    languageIdentifierLabel.text = voice.identifier
+    languageIdentifierLabel?.text = voice.identifier
+    qualityControl.selectedSegmentIndex = voice.quality.rawValue
+      - AVSpeechSynthesisVoiceQuality.Default.rawValue
+    
+    let code_parts = code.componentsSeparatedByString("-")
+    languageNameLabel.text = current_locale.displayNameForKey(NSLocaleLanguageCode, value: code_parts[0])
+    countryNameLabel.text  = current_locale.displayNameForKey(NSLocaleCountryCode, value: code_parts[1])
+    
+    let text = target_locale.displayNameForKey(NSLocaleIdentifier, value: code)
     detailDescriptionLabel.text = text
     speakingText = text
-    qualityControl.selectedSegmentIndex = voice.quality.rawValue - AVSpeechSynthesisVoiceQuality.Default.rawValue
   }
 
 
